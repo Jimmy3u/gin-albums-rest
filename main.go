@@ -2,7 +2,7 @@ package main
 
 import (
 	"example/webservice/controllers"
-	"example/webservice/models"
+	"example/webservice/database"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +19,8 @@ func main() {
 
 	router.Use(logger())
 
-	models.ConnectDatabase()
+	database.InitDatabase()
+
 	albums := router.Group("/albums")
 	{
 		albums.GET("", controllers.GetAlbums)
@@ -29,6 +30,8 @@ func main() {
 		albums.POST("", controllers.AddAlbum)
 
 		albums.DELETE("/:id", controllers.DeleteAlbum)
+
+		albums.PUT("/:id", controllers.UpdateAlbum)
 	}
 
 	router.Run(":8080")

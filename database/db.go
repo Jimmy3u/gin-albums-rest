@@ -1,4 +1,4 @@
-package models
+package database
 
 import (
 	"gorm.io/driver/sqlite"
@@ -7,14 +7,11 @@ import (
 
 var DB *gorm.DB
 
-func ConnectDatabase() {
-
+func InitDatabase() {
 	db, err := gorm.Open(sqlite.Open("teste.db"), &gorm.Config{})
 	if err != nil {
 		panic("Unable to connect to database")
 	}
 
 	DB = db
-
-	db.AutoMigrate(&Album{})
 }

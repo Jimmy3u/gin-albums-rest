@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"example/webservice/database"
 	"example/webservice/models"
 
 	"github.com/gin-gonic/gin"
@@ -8,7 +9,8 @@ import (
 
 func GetAlbums(c *gin.Context) {
 	var albums []models.Album
-	models.DB.Find(&albums)
+
+	database.DB.Find(&albums)
 
 	c.JSON(200, albums)
 }
@@ -16,7 +18,7 @@ func GetAlbumByID(c *gin.Context) {
 	var album models.Album
 
 	// Caso erro ao buscar retorna um 404
-	if err := models.DB.First(&album, c.Param("id")).Error; err != nil {
+	if err := database.DB.First(&album, c.Param("id")).Error; err != nil {
 		c.JSON(404, gin.H{"Message": "Album not found"})
 		return
 	}
@@ -32,7 +34,7 @@ func AddAlbum(c *gin.Context) {
 		return
 	}
 
-	models.DB.Create(&newAlbum)
+	database.DB.Create(&newAlbum)
 
 	c.JSON(201, newAlbum)
 }
@@ -40,12 +42,28 @@ func AddAlbum(c *gin.Context) {
 func DeleteAlbum(c *gin.Context) {
 	var album models.Album
 
-	if err := models.DB.First(&album, c.Param("id")).Error; err != nil {
+	if err := database.DB.First(&album, c.Param("id")).Error; err != nil {
 		c.JSON(404, gin.H{"Message": "Album not found"})
 		return
 	}
 
-	models.DB.Delete(&album, c.Param("id"))
+	database.DB.Delete(&album, c.Param("id"))
 
 	c.JSON(200, gin.H{"deleted": &album})
+}
+
+func UpdateAlbum(c *gin.Context) {
+	var a models.Album
+
+	if err := database.DB.First(&a, c.Param("id")).Error; err != nil {
+		c.JSON(404, gin.H{"Message": "Album not found"})
+		return
+	} else if err := c.BindJSON(&a); err != nil {
+		c.AbortWithStatus(400)
+		return
+	}
+
+	database.DB.Save(&a)
+
+	c.JSON(200, a)
 }
